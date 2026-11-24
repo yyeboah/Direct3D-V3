@@ -2,3 +2,12 @@ __pycache__/
 *.pyc
 /output.glb
 /output/
+/.conda-envs/
+/.conda-pkgs/
+/.pip-cache/
+/.hf-cache/
+/models/
+/.wheels/
+/generated*.glb
+/generated*.obj
+/generated*.ply

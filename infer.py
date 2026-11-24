@@ -64,6 +64,10 @@ def main():
         parser.add_argument(f"--cfg-{stage}", type=float, help=f"Override the CFG scale for {stage} only")
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument(
+        "--background-removed", action="store_true",
+        help="Skip segmentation when the input already has a transparent background",
+    )
+    parser.add_argument(
         "--max-tokens", type=int, default=DEFAULT_MAX_TOKENS,
         help="Maximum sparse tokens per stage (default: %(default)s). Lower this if you run out of GPU memory. "
              "The mesh may lose fine surface detail.",
@@ -131,6 +135,7 @@ def main():
             max_tokens=args.max_tokens,
             mc_threshold=args.mc_threshold,
             target_faces=args.target_faces,
+            background_removed=args.background_removed,
         )
         dest.parent.mkdir(parents=True, exist_ok=True)
         result.export(dest)

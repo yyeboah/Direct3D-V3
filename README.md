@@ -66,12 +66,29 @@ Pass the prepared normal map or white clay image as `--image`, together with its
 
 To remove surface textures from an RGB image before mesh generation, see [Texture removal with Qwen-Image-2.1](#texture-removal-with-qwen-image-21).
 
+## End-to-end image-to-refined-mesh runner
+
+This repository also includes a single runner that removes the background when needed, generates a coarse shape with Hunyuan3D-2.1, and refines it with Direct3D-V3:
+
+```bash
+./runner.sh path/to/image.png path/to/refined.glb
+```
+
+For example, reproduce the EV and GPU results from the included transparent input images:
+
+```bash
+./runner.sh assets/input_imgs/ev.png generated-ev.glb
+./runner.sh assets/input_imgs/gpu.png generated-gpu.glb
+```
+
+The runner uses separate Direct3D-V3 and Hunyuan Conda environments. It downloads the pinned model checkpoints from Hugging Face on first use; the checkpoint repositories, revisions, setup instructions, and hardware requirements are in [MODEL_SOURCES.md](MODEL_SOURCES.md) and [END_TO_END.md](END_TO_END.md). Checkpoints and generated meshes are kept out of Git. Review each model's license before use.
+
 ## Installation
 
 The demo uses Python 3.12, PyTorch 2.14.1, and CUDA 13.0 on Linux. Install the CUDA 13.0 toolkit and a C++20 compiler before building the GPU extensions.
 
 ```bash
-git clone https://github.com/DreamTechAI/Direct3D-V3.git
+git clone https://github.com/yyeboah/Direct3D-V3.git
 cd Direct3D-V3
 conda create -n direct3d-v3 python=3.12 -y
 conda activate direct3d-v3

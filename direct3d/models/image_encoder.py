@@ -31,7 +31,14 @@ class DINOv3FeatureExtractor(torch.nn.Module):
                 image, size=(image_size, image_size), mode="bicubic", align_corners=False, antialias=True
             )
         image = self.normalize(image).to(weight.dtype)
-        tokens = backbone.embeddings(image)
+        try:
+            tokens = backbone.embeddings(image)
+        except RuntimeError as error:
+            if "GET was unable to find an engine" not in str(error):
+                raise
+            # Jetson cuDNN may not provide an FP16 engine for this patch conv.
+            with torch.backends.cudnn.flags(enabled=False):
+                tokens = backbone.embeddings(image)
         positions = backbone.rope_embeddings(image)
 
         # Transformers exposes the blocks on the backbone or its nested encoder.

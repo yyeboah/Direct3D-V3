@@ -33,7 +33,16 @@ class BackgroundRemover:
         self.model.to(device)
         try:
             with torch.autocast("cuda", dtype=torch.float16):
-                alpha = self.model(batch)[-1].sigmoid()[0, 0].cpu()
+                try:
+                    predictions = self.model(batch)
+                except RuntimeError as error:
+                    if "GET was unable to find an engine" not in str(error):
+                        raise
+                    # Some Jetson cuDNN builds have no engine for BiRefNet's
+                    # FP16 convolutions; PyTorch's CUDA fallback kernels work.
+                    with torch.backends.cudnn.flags(enabled=False):
+                        predictions = self.model(batch)
+                alpha = predictions[-1].sigmoid()[0, 0].cpu()
         finally:
             self.model.cpu()
         mask = transforms.ToPILImage()(alpha).resize(rgb.size)
